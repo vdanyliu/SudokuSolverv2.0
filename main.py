@@ -10,4 +10,5 @@ if __name__ == '__main__':
         for line in lines:
             sudoku_data.append(tuple(map(int, (line.split()))))
     test = SudokuSolver(tuple(sudoku_data), dev=True)
-    test.get_next_solution()
+    for solve in test.solves():
+        print(solve)

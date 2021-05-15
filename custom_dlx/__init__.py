@@ -37,6 +37,7 @@ class DLX:
 
     def solves(self):
         end = False
+        i = 0
         while True:
             selected_up_header = self.__select_up_header() if not end else None
             if selected_up_header:
@@ -48,7 +49,7 @@ class DLX:
                 if not self.buff:
                     break
                 if self.links_head.rg == self.links_head:
-                    yield self.buff
+                    yield [x.x for x in self.buff]
                 node = self.buff.pop()
                 self.__cross_restore(node)
                 node = node.dw
@@ -65,14 +66,17 @@ class DLX:
         head = node.lfh.rg
         while head != head.lfh:
             up_headers_list.append(head.uph.dw)
+            head = head.rg
         left_headers_list = []
         for head in up_headers_list:
             while head != head.uph:
                 left_headers_list.append(head.lfh.rg)
+                head = head.dw
+        left_headers_list = list(dict.fromkeys(left_headers_list))
         for head in left_headers_list:
             while head != head.lfh:
-                if head.uph.dw not in up_headers_list:
-                    self.__del_node_from_horizontal_link(head)
+                self.__del_node_from_horizontal_link(head)
+                head = head.rg
         for head in up_headers_list:
             self.__del_node_from_vertical_link(head.uph)
 
@@ -81,6 +85,7 @@ class DLX:
         lf_node = node.lf
         rg_node = node.rg
         lf_node.rg, rg_node.lf = rg_node, lf_node
+        node.uph.counter -= 1
 
     @staticmethod
     def __del_node_from_horizontal_link(node: Node):
@@ -93,23 +98,37 @@ class DLX:
         head = node.lfh.rg
         while head != head.lfh:
             up_headers_list.append(head.uph.dw)
+            head = head.rg
         left_headers_list = []
         for head in up_headers_list:
             while head != head.uph:
                 left_headers_list.append(head.lfh.rg)
+                head = head.dw
         for head in left_headers_list:
             while head != head.lfh:
-                if head.uph.dw not in up_headers_list:
-                    self.__del_node_from_horizontal_link(head)
+                self.__restore_node_from_horizontal_link(head)
+                head = head.rg
         for head in up_headers_list:
-            self.__del_node_from_vertical_link(head.uph)
+            self.__restore_node_from_vertical_link(head.uph)
+
+    @staticmethod
+    def __restore_node_from_vertical_link(node: Node):
+        lf_node = node.lf
+        rg_node = node.rg
+        lf_node.rg, rg_node.lf = node, node
+
+    @staticmethod
+    def __restore_node_from_horizontal_link(node: Node):
+        up_node = node.up
+        dw_node = node.dw
+        up_node.dw, dw_node.up = node, node
 
     def __select_up_header(self):
         head = selected = self.links_head.rg
         while head != self.links_head:
-            if head.counter < selected:
+            if head.counter < selected.counter:
                 selected = head
-                head = head.rg
+            head = head.rg
         return selected if (selected != self.links_head and selected.counter) else None
 
     def __generate_headers(self):
@@ -128,12 +147,16 @@ class DLX:
     @staticmethod
     def __add_down_node(node1: Node, node2: Node):
         node2.uph = node1.uph
-        node2.up, node2.dw, node1.dw, node1.dw.up = node1, node1.dw, node2, node2
+        node3 = node1.dw
+        node2.up, node2.dw = node1, node3
+        node1.dw = node3.up = node2
 
     @staticmethod
     def __add_right_node(node1: Node, node2: Node):
         node2.lfh = node1.lfh
-        node2.lf, node2.rg, node1.rg, node1.rg.lf = node1, node1.rg, node2, node2
+        node3 = node1.rg
+        node2.lf, node2.rg = node1, node3
+        node1.rg = node3.lf = node2
 
     @staticmethod
     def __init_logger(developer_mode: bool):

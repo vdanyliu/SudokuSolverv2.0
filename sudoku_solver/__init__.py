@@ -21,10 +21,21 @@ class SudokuSolver:
         self.__optimize_coating_matrix()
         self.DLX = DLX(self.matrix, dev=True)
 
+    def solves(self):
+        matrix_of_solution = np.matrix(self.sudoku).A
+        size_sqr = self.size * self.size
+        for solve in self.DLX.solves():
+            for data in solve:
+                num = data // size_sqr + 1
+                x = data % size_sqr // self.size
+                y = data % size_sqr % self.size
+                matrix_of_solution[x][y] = num
+            yield matrix_of_solution
+
     def __generate_coating_matrix(self):
         # TODO Комменты
-        size_sqr = self.size ** 2
-        size_cube = self.size ** 3
+        size_sqr = self.size * self.size
+        size_cube = size_sqr * self.size
         matrix = np.zeros((size_cube, 4 * size_sqr), dtype=bool)
         for x in range(size_cube):
             matrix[x][0 * size_sqr + x % size_sqr] = True
@@ -47,9 +58,6 @@ class SudokuSolver:
             log_level = logging.DEBUG
         logging.basicConfig(filename='sudoku.log', level=log_level, filemode='w',
                             format='%(asctime)s %(levelname)s\n %(message)s', datefmt='%H:%M:%S')
-
-    def get_next_solution(self):
-        return 0
 
     def __optimize_coating_matrix(self):
         del_list_of_rows = self.__sudoku_conditions_in_matrix_rows()
