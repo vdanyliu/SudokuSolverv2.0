@@ -13,7 +13,7 @@ class Node:
         self.y = y
         self.counter = 0
 
-    def __str__(self):
+    def __repr__(self):
         data = '(x={};y={})'.format(self.x, self.y)
         if self.counter:
             data += '({})'.format(self.counter)
@@ -33,20 +33,18 @@ class DLX:
         self.links_head = Node(-1, -1)
         self.__generate_headers()
         self.__fill_main_linked_list(*self.__generate_nodes_lists())
-        self.__debug_linked_list()
+        self.__dict_of_deleted_nodes = {}
 
     def solves(self):
         end = False
-        i = 0
         while True:
             selected_up_header = self.__select_up_header() if not end else None
             if selected_up_header:
                 node = selected_up_header.dw
                 self.buff.append(node)
                 self.__cross_del(node)
-                continue
             else:
-                if not self.buff:
+                if not self.buff and end:
                     break
                 if self.links_head.rg == self.links_head:
                     yield [x.x for x in self.buff]
@@ -57,7 +55,6 @@ class DLX:
                     self.buff.append(node)
                     self.__cross_del(node)
                     end = False
-                    continue
                 else:
                     end = True
 
@@ -73,6 +70,7 @@ class DLX:
                 left_headers_list.append(head.lfh.rg)
                 head = head.dw
         left_headers_list = list(dict.fromkeys(left_headers_list))
+        self.__dict_of_deleted_nodes[node] = left_headers_list
         for head in left_headers_list:
             while head != head.lfh:
                 self.__del_node_from_horizontal_link(head)
@@ -85,13 +83,13 @@ class DLX:
         lf_node = node.lf
         rg_node = node.rg
         lf_node.rg, rg_node.lf = rg_node, lf_node
-        node.uph.counter -= 1
 
     @staticmethod
     def __del_node_from_horizontal_link(node: Node):
         up_node = node.up
         dw_node = node.dw
         up_node.dw, dw_node.up = dw_node, up_node
+        node.uph.counter -= 1
 
     def __cross_restore(self, node: Node):
         up_headers_list = []
@@ -99,15 +97,12 @@ class DLX:
         while head != head.lfh:
             up_headers_list.append(head.uph.dw)
             head = head.rg
-        left_headers_list = []
-        for head in up_headers_list:
-            while head != head.uph:
-                left_headers_list.append(head.lfh.rg)
-                head = head.dw
+        left_headers_list = self.__dict_of_deleted_nodes[node]
         for head in left_headers_list:
             while head != head.lfh:
                 self.__restore_node_from_horizontal_link(head)
                 head = head.rg
+        del self.__dict_of_deleted_nodes[node]
         for head in up_headers_list:
             self.__restore_node_from_vertical_link(head.uph)
 
@@ -122,6 +117,7 @@ class DLX:
         up_node = node.up
         dw_node = node.dw
         up_node.dw, dw_node.up = node, node
+        node.uph.counter += 1
 
     def __select_up_header(self):
         head = selected = self.links_head.rg

@@ -25,6 +25,7 @@ class SudokuSolver:
         matrix_of_solution = np.matrix(self.sudoku).A
         size_sqr = self.size * self.size
         for solve in self.DLX.solves():
+            logging.debug(solve)
             for data in solve:
                 num = data // size_sqr + 1
                 x = data % size_sqr // self.size
