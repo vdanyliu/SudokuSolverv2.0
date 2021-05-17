@@ -38,12 +38,14 @@ class DLX:
     def solves(self):
         end = False
         while True:
+            logging.debug(len(self.buff))
             selected_up_header = self.__select_up_header() if not end else None
             if selected_up_header:
                 node = selected_up_header.dw
                 self.buff.append(node)
                 self.__cross_del(node)
             else:
+                # yield [x.x for x in self.buff]
                 if not self.buff and end:
                     break
                 if self.links_head.rg == self.links_head:
@@ -121,10 +123,11 @@ class DLX:
 
     def __select_up_header(self):
         head = selected = self.links_head.rg
-        while head != self.links_head:
+        while selected.counter and head != self.links_head:
             if head.counter < selected.counter:
                 selected = head
             head = head.rg
+        logging.debug(selected)
         return selected if (selected != self.links_head and selected.counter) else None
 
     def __generate_headers(self):

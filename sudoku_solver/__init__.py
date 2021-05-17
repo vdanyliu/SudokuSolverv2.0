@@ -19,13 +19,12 @@ class SudokuSolver:
         self.matrix = self.__generate_coating_matrix()
         self.sudoku = source
         self.__optimize_coating_matrix()
-        self.DLX = DLX(self.matrix, dev=True)
+        self.DLX = DLX(self.matrix, dev=dev)
 
     def solves(self):
         matrix_of_solution = np.matrix(self.sudoku).A
         size_sqr = self.size * self.size
         for solve in self.DLX.solves():
-            logging.debug(solve)
             for data in solve:
                 num = data // size_sqr + 1
                 x = data % size_sqr // self.size

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3.8
 import logging
 import sys
+import itertools
 
 from sudoku_solver import SudokuSolver
 
@@ -10,6 +11,9 @@ if __name__ == '__main__':
         lines = f.readlines()
         for line in lines:
             sudoku_data.append(tuple(map(int, (line.split()))))
-    test = SudokuSolver(tuple(sudoku_data), dev=True)
+    test = SudokuSolver(tuple(sudoku_data), dev=False)
+    i = 0
     for solve in test.solves():
-        logging.debug(solve)
+        print(solve)
+
+
