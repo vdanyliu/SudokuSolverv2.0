@@ -13,7 +13,7 @@ class Node:
         self.y = y
         self.counter = 0
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         data = '(x={};y={})'.format(self.x, self.y)
         if self.counter:
             data += '({})'.format(self.counter)
@@ -127,7 +127,8 @@ class DLX:
             if head.counter < selected.counter:
                 selected = head
             head = head.rg
-        logging.debug(selected)
+        logging.debug(self.__debug_linked_list_header())
+        # logging.debug(selected)
         return selected if (selected != self.links_head and selected.counter) else None
 
     def __generate_headers(self):
@@ -180,6 +181,14 @@ class DLX:
                 head1 = head1.dw
                 if head1 == self.links_head:
                     break
+
+    def __debug_linked_list_header(self):
+        data = []
+        head = self.links_head.rg
+        while head != head.lfh:
+            data.append(str(head))
+            head = head.rg
+        logging.debug(''.join(data))
 
     def __fill_main_linked_list(self, horizontal: dict, vertical: dict):
         # Лютая хуйня, нужно переписать

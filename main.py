@@ -11,9 +11,10 @@ if __name__ == '__main__':
         lines = f.readlines()
         for line in lines:
             sudoku_data.append(tuple(map(int, (line.split()))))
-    test = SudokuSolver(tuple(sudoku_data), dev=False)
+    test = SudokuSolver(tuple(sudoku_data), dev=True)
     i = 0
     for solve in test.solves():
         print(solve)
+        break
 
 
